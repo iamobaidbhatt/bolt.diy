@@ -1,368 +1,187 @@
-# bolt.diy
+# 🌟 Hotstar Cookie Validator
 
-[![bolt.diy: AI-Powered Full-Stack Web Development in the Browser](./public/social_preview_index.jpg)](https://bolt.diy)
+A comprehensive tool to validate Hotstar cookies from files or folders on your computer. This application helps you identify valid Hotstar cookies and filter out expired or invalid ones with proper validation logic.
 
-Welcome to bolt.diy, the official open source version of Bolt.new, which allows you to choose the LLM that you use for each prompt! Currently, you can use OpenAI, Anthropic, Ollama, OpenRouter, Gemini, LMStudio, Mistral, xAI, HuggingFace, DeepSeek, or Groq models - and it is easily extended to use any other model supported by the Vercel AI SDK! See the instructions below for running this locally and extending it to include more models.
+## 🚀 Features
 
------
-Check the [bolt.diy Docs](https://stackblitz-labs.github.io/bolt.diy/) for more offical installation instructions and more informations.
+- **File & Folder Support**: Select individual cookie files or entire folders
+- **Comprehensive Validation**: Validates cookie format, expiry, domains, and Hotstar-specific requirements
+- **Beautiful GUI**: Modern dark theme with intuitive interface
+- **Real-time Progress**: Progress bar and status updates during validation
+- **Detailed Results**: Separate tabs for valid and invalid cookies with detailed information
+- **Export Functionality**: Export valid cookies to a new file
+- **JWT Validation**: Special validation for Hotstar JWT tokens (userUP, sessionUserUP)
+- **CloudFront Support**: Validates CloudFront cookies for video streaming
 
------
-Also [this pinned post in our community](https://thinktank.ottomator.ai/t/videos-tutorial-helpful-content/3243) has a bunch of incredible resources for running and deploying bolt.diy yourself!
+## 📋 Supported Cookie Format
 
-We have also launched an experimental agent called the "bolt.diy Expert" that can answer common questions about bolt.diy. Find it here on the [oTTomator Live Agent Studio](https://studio.ottomator.ai/).
+The tool supports Netscape cookie format (tab-separated values):
+```
+domain    domain_flag    path    secure    expires    name    value
+```
 
-bolt.diy was originally started by [Cole Medin](https://www.youtube.com/@ColeMedin) but has quickly grown into a massive community effort to build the BEST open source AI coding assistant!
+Example from your provided format:
+```
+www.hotstar.com	FALSE	/	FALSE	1753802789	deviceId	bfbdeb5a-0edd-4e57-8693-1c3564f18925
+```
 
-## Table of Contents
+## 🔍 Validation Logic
 
-- [Join the Community](#join-the-community)
-- [Requested Additions](#requested-additions)
-- [Features](#features)
-- [Setup](#setup)
-- [Run the Application](#run-the-application)
-- [Available Scripts](#available-scripts)
-- [Contributing](#contributing)
-- [Roadmap](#roadmap)
-- [FAQ](#faq)
+### Hotstar Cookie Detection
+- **Domains**: `hotstar.com`, `.hotstar.com`, `www.hotstar.com`, CloudFront CDN domains
+- **Cookie Names**: `deviceId`, `userHID`, `userPID`, `userUP`, `sessionUserUP`, CloudFront cookies, analytics cookies
 
-## Join the community
+### Validation Checks
+1. **Domain Validation**: Ensures cookie belongs to Hotstar domains
+2. **Expiry Check**: Validates if cookies are not expired
+3. **Essential Cookies**: Checks for required Hotstar authentication cookies
+4. **JWT Format**: Validates JWT token structure for user authentication
+5. **Security Flags**: Ensures CloudFront cookies have proper security settings
+6. **Value Validation**: Checks for empty or malformed cookie values
 
-[Join the bolt.diy community here, in the oTTomator Think Tank!](https://thinktank.ottomator.ai)
+## 🛠️ Installation & Usage
 
-## Project management
+### Prerequisites
+- Python 3.6 or higher
+- No additional dependencies required (uses Python standard library)
 
-Bolt.diy is a community effort! Still, the core team of contributors aims at organizing the project in way that allows
-you to understand where the current areas of focus are.
+### Running the Application
 
-If you want to know what we are working on, what we are planning to work on, or if you want to contribute to the
-project, please check the [project management guide](./PROJECT.md) to get started easily.
-
-## Requested Additions
-
-- ✅ OpenRouter Integration (@coleam00)
-- ✅ Gemini Integration (@jonathands)
-- ✅ Autogenerate Ollama models from what is downloaded (@yunatamos)
-- ✅ Filter models by provider (@jasonm23)
-- ✅ Download project as ZIP (@fabwaseem)
-- ✅ Improvements to the main bolt.new prompt in `app\lib\.server\llm\prompts.ts` (@kofi-bhr)
-- ✅ DeepSeek API Integration (@zenith110)
-- ✅ Mistral API Integration (@ArulGandhi)
-- ✅ "Open AI Like" API Integration (@ZerxZ)
-- ✅ Ability to sync files (one way sync) to local folder (@muzafferkadir)
-- ✅ Containerize the application with Docker for easy installation (@aaronbolton)
-- ✅ Publish projects directly to GitHub (@goncaloalves)
-- ✅ Ability to enter API keys in the UI (@ali00209)
-- ✅ xAI Grok Beta Integration (@milutinke)
-- ✅ LM Studio Integration (@karrot0)
-- ✅ HuggingFace Integration (@ahsan3219)
-- ✅ Bolt terminal to see the output of LLM run commands (@thecodacus)
-- ✅ Streaming of code output (@thecodacus)
-- ✅ Ability to revert code to earlier version (@wonderwhy-er)
-- ✅ Chat history backup and restore functionality (@sidbetatester)
-- ✅ Cohere Integration (@hasanraiyan)
-- ✅ Dynamic model max token length (@hasanraiyan)
-- ✅ Better prompt enhancing (@SujalXplores)
-- ✅ Prompt caching (@SujalXplores)
-- ✅ Load local projects into the app (@wonderwhy-er)
-- ✅ Together Integration (@mouimet-infinisoft)
-- ✅ Mobile friendly (@qwikode)
-- ✅ Better prompt enhancing (@SujalXplores)
-- ✅ Attach images to prompts (@atrokhym)(@stijnus)
-- ✅ Added Git Clone button (@thecodacus)
-- ✅ Git Import from url (@thecodacus)
-- ✅ PromptLibrary to have different variations of prompts for different use cases (@thecodacus)
-- ✅ Detect package.json and commands to auto install & run preview for folder and git import (@wonderwhy-er)
-- ✅ Selection tool to target changes visually (@emcconnell)
-- ✅ Detect terminal Errors and ask bolt to fix it (@thecodacus)
-- ✅ Detect preview Errors and ask bolt to fix it (@wonderwhy-er)
-- ✅ Add Starter Template Options (@thecodacus)
-- ✅ Perplexity Integration (@meetpateltech)
-- ✅ AWS Bedrock Integration (@kunjabijukchhe)
-- ✅ Add a "Diff View" to see the changes (@toddyclipsgg)
-- ⬜ **HIGH PRIORITY** - Prevent bolt from rewriting files as often (file locking and diffs)
-- ⬜ **HIGH PRIORITY** - Better prompting for smaller LLMs (code window sometimes doesn't start)
-- ⬜ **HIGH PRIORITY** - Run agents in the backend as opposed to a single model call
-- ✅ Deploy directly to Netlify (@xKevIsDev)
-- ✅ Supabase Integration (@xKevIsDev)
-- ⬜ Have LLM plan the project in a MD file for better results/transparency
-- ⬜ VSCode Integration with git-like confirmations
-- ⬜ Upload documents for knowledge - UI design templates, a code base to reference coding style, etc.
-- ✅ Voice prompting
-- ⬜ Azure Open AI API Integration
-- ⬜ Vertex AI Integration
-- ⬜ Granite Integration
-- ✅ Popout Window for Web Container(@stijnus)
-- ✅ Ability to change Popout window size (@stijnus)
-
-## Features
-
-- **AI-powered full-stack web development** for **NodeJS based applications** directly in your browser.
-- **Support for multiple LLMs** with an extensible architecture to integrate additional models.
-- **Attach images to prompts** for better contextual understanding.
-- **Integrated terminal** to view output of LLM-run commands.
-- **Revert code to earlier versions** for easier debugging and quicker changes.
-- **Download projects as ZIP** for easy portability Sync to a folder on the host.
-- **Integration-ready Docker support** for a hassle-free setup.
-- **Deploy** directly to **Netlify**
-
-## Setup
-
-If you're new to installing software from GitHub, don't worry! If you encounter any issues, feel free to submit an "issue" using the provided links or improve this documentation by forking the repository, editing the instructions, and submitting a pull request. The following instruction will help you get the stable branch up and running on your local machine in no time.
-
-Let's get you up and running with the stable version of Bolt.DIY!
-
-## Quick Download
-
-[![Download Latest Release](https://img.shields.io/github/v/release/stackblitz-labs/bolt.diy?label=Download%20Bolt&sort=semver)](https://github.com/stackblitz-labs/bolt.diy/releases/latest) ← Click here to go the the latest release version!
-
-- Next **click source.zip**
-
-## Prerequisites
-
-Before you begin, you'll need to install two important pieces of software:
-
-### Install Node.js
-
-Node.js is required to run the application.
-
-1. Visit the [Node.js Download Page](https://nodejs.org/en/download/)
-2. Download the "LTS" (Long Term Support) version for your operating system
-3. Run the installer, accepting the default settings
-4. Verify Node.js is properly installed:
-   - **For Windows Users**:
-     1. Press `Windows + R`
-     2. Type "sysdm.cpl" and press Enter
-     3. Go to "Advanced" tab → "Environment Variables"
-     4. Check if `Node.js` appears in the "Path" variable
-   - **For Mac/Linux Users**:
-     1. Open Terminal
-     2. Type this command:
-        ```bash
-        echo $PATH
-        ```
-     3. Look for `/usr/local/bin` in the output
-
-## Running the Application
-
-You have two options for running Bolt.DIY: directly on your machine or using Docker.
-
-### Option 1: Direct Installation (Recommended for Beginners)
-
-1. **Install Package Manager (pnpm)**:
-
+1. **Download the script**:
    ```bash
-   npm install -g pnpm
+   python hotstar_cookie_validator.py
    ```
 
-2. **Install Project Dependencies**:
+2. **Using the GUI**:
+   - Click "📁 Select Cookie File" to choose a single cookie file
+   - Click "📂 Select Folder" to scan an entire folder for cookie files
+   - Click "✅ Validate Cookies" to start the validation process
+   - View results in the "Valid Cookies" and "Invalid Cookies" tabs
+   - Click "💾 Export Valid Cookies" to save valid cookies to a new file
 
-   ```bash
-   pnpm install
-   ```
+### Command Line Alternative
+You can also run the script directly:
+```bash
+python3 hotstar_cookie_validator.py
+```
 
-3. **Start the Application**:
+## 📁 File Support
 
-   ```bash
-   pnpm run dev
-   ```
-   
-### Option 2: Using Docker
+The tool automatically detects and processes:
+- `.txt` files
+- `.cookies` files
+- `.dat` files
+- Any text file containing Netscape-format cookies
 
-This option requires some familiarity with Docker but provides a more isolated environment.
+## 🎯 Cookie Categories Validated
 
-#### Additional Prerequisite
+### Essential Hotstar Cookies
+- `deviceId`: Device identification
+- `userHID`: User hash ID
+- `userPID`: User profile ID
+- `userUP`: User profile JWT token
+- `sessionUserUP`: Session user JWT token
 
-- Install Docker: [Download Docker](https://www.docker.com/)
+### CloudFront Cookies (Video Streaming)
+- `CloudFront-Key-Pair-Id`: CDN key pair identification
+- `CloudFront-Policy`: Access policy for video content
+- `CloudFront-Signature`: Security signature for content access
 
-#### Steps:
+### Analytics & Tracking
+- `_ga`, `_gid`: Google Analytics cookies
+- `_fbp`: Facebook pixel tracking
+- `loc`: Location information
+- `geo`: Geographical data
 
-1. **Build the Docker Image**:
+### Preferences
+- `SELECTED__LANGUAGE`: User language preference
+- Various other tracking and preference cookies
 
-   ```bash
-   # Using npm script:
-   npm run dockerbuild
+## 🔧 Validation Results
 
-   # OR using direct Docker command:
-   docker build . --target bolt-ai-development
-   ```
+### Valid Cookies Display
+- Cookie name and domain
+- Expiration date (if applicable)
+- Source file information
+- Raw cookie line for easy copying
 
-2. **Run the Container**:
-   ```bash
-   docker compose --profile development up
-   ```
+### Invalid Cookies Display
+- Cookie details
+- Specific validation issues
+- Reasons for rejection (expired, invalid format, etc.)
 
-## Configuring API Keys and Providers
+### Statistics
+- Total cookies processed
+- Count of valid cookies
+- Count of invalid cookies
 
-### Adding Your API Keys
+## 🚨 Common Validation Issues
 
-Setting up your API keys in Bolt.DIY is straightforward:
+1. **Expired Cookies**: Cookies past their expiration date
+2. **Invalid Domain**: Cookies not belonging to Hotstar domains
+3. **Empty Values**: Essential cookies with missing values
+4. **Malformed JWT**: Invalid JWT token structure
+5. **Security Issues**: CloudFront cookies missing security flags
 
-1. Open the home page (main interface)
-2. Select your desired provider from the dropdown menu
-3. Click the pencil (edit) icon
-4. Enter your API key in the secure input field
+## 💾 Export Features
 
-![API Key Configuration Interface](./docs/images/api-key-ui-section.png)
+- Export only valid cookies to a new file
+- Includes metadata (export date, count)
+- Maintains original Netscape format
+- Easy to import into browsers or other tools
 
-### Configuring Custom Base URLs
+## 🎨 Interface Features
 
-For providers that support custom base URLs (such as Ollama or LM Studio), follow these steps:
+- **Dark Theme**: Easy on the eyes for extended use
+- **Progress Tracking**: Real-time progress during validation
+- **Tabbed Results**: Organized display of valid/invalid cookies
+- **Status Updates**: Continuous feedback on current operations
+- **File Information**: Shows source file for each cookie
 
-1. Click the settings icon in the sidebar to open the settings menu
-   ![Settings Button Location](./docs/images/bolt-settings-button.png)
+## 🔒 Privacy & Security
 
-2. Navigate to the "Providers" tab
-3. Search for your provider using the search bar
-4. Enter your custom base URL in the designated field
-   ![Provider Base URL Configuration](./docs/images/provider-base-url.png)
+- **Local Processing**: All validation happens locally on your computer
+- **No Network Calls**: Tool doesn't send data anywhere
+- **File Safety**: Only reads files, doesn't modify original files
+- **Export Control**: You choose where to save results
 
-> **Note**: Custom base URLs are particularly useful when running local instances of AI models or using custom API endpoints.
+## 🐛 Troubleshooting
 
-### Supported Providers
+### Common Issues
+1. **No GUI appears**: Ensure Python has tkinter support
+2. **File reading errors**: Check file permissions and encoding
+3. **Empty results**: Verify cookie file format matches Netscape standard
 
-- Ollama
-- LM Studio
-- OpenAILike
+### File Format Requirements
+- Tab-separated values (not spaces)
+- Minimum 6 columns per line
+- Proper Unix timestamp for expiry field
+- No special characters in essential fields
 
-## Setup Using Git (For Developers only)
+## 📝 Example Usage Workflow
 
-This method is recommended for developers who want to:
+1. **Collect Cookies**: Export cookies from browser or obtain cookie files
+2. **Select Input**: Choose individual files or entire folders
+3. **Validate**: Run validation to identify working cookies
+4. **Review Results**: Check valid/invalid tabs for detailed information
+5. **Export**: Save valid cookies for use in other applications
 
-- Contribute to the project
-- Stay updated with the latest changes
-- Switch between different versions
-- Create custom modifications
+## 🔄 Future Enhancements
 
-#### Prerequisites
+- Browser integration for direct cookie import
+- Bulk cookie testing with Hotstar API
+- Cookie refresh/renewal suggestions
+- Advanced filtering and sorting options
+- Backup and restore functionality
 
-1. Install Git: [Download Git](https://git-scm.com/downloads)
+## ⚠️ Disclaimer
 
-#### Initial Setup
+This tool is for educational and personal use only. Ensure you have proper authorization to use any cookies you validate. Respect Hotstar's terms of service and applicable laws regarding cookie usage.
 
-1. **Clone the Repository**:
+## 🤝 Contributing
 
-   ```bash
-   git clone -b stable https://github.com/stackblitz-labs/bolt.diy.git
-   ```
-
-2. **Navigate to Project Directory**:
-
-   ```bash
-   cd bolt.diy
-   ```
-
-3. **Install Dependencies**:
-
-   ```bash
-   pnpm install
-   ```
-
-4. **Start the Development Server**:
-   ```bash
-   pnpm run dev
-   ```
-
-5. **(OPTIONAL)** Switch to the Main Branch if you want to use pre-release/testbranch:
-   ```bash
-   git checkout main
-   pnpm install
-   pnpm run dev
-   ```
-  Hint: Be aware that this can have beta-features and more likely got bugs than the stable release
-
->**Open the WebUI to test (Default: http://localhost:5173)**
->   - Beginngers: 
->     - Try to use a sophisticated Provider/Model like Anthropic with Claude Sonnet 3.x Models to get best results
->     - Explanation: The System Prompt currently implemented in bolt.diy cant cover the best performance for all providers and models out there. So it works better with some models, then other, even if the models itself are perfect for >programming
->     - Future: Planned is a Plugin/Extentions-Library so there can be different System Prompts for different Models, which will help to get better results
-
-#### Staying Updated
-
-To get the latest changes from the repository:
-
-1. **Save Your Local Changes** (if any):
-
-   ```bash
-   git stash
-   ```
-
-2. **Pull Latest Updates**:
-
-   ```bash
-   git pull 
-   ```
-
-3. **Update Dependencies**:
-
-   ```bash
-   pnpm install
-   ```
-
-4. **Restore Your Local Changes** (if any):
-   ```bash
-   git stash pop
-   ```
-
-#### Troubleshooting Git Setup
-
-If you encounter issues:
-
-1. **Clean Installation**:
-
-   ```bash
-   # Remove node modules and lock files
-   rm -rf node_modules pnpm-lock.yaml
-
-   # Clear pnpm cache
-   pnpm store prune
-
-   # Reinstall dependencies
-   pnpm install
-   ```
-
-2. **Reset Local Changes**:
-   ```bash
-   # Discard all local changes
-   git reset --hard origin/main
-   ```
-
-Remember to always commit your local changes or stash them before pulling updates to avoid conflicts.
+Feel free to submit issues, feature requests, or improvements to enhance this tool's functionality.
 
 ---
 
-## Available Scripts
-
-- **`pnpm run dev`**: Starts the development server.
-- **`pnpm run build`**: Builds the project.
-- **`pnpm run start`**: Runs the built application locally using Wrangler Pages.
-- **`pnpm run preview`**: Builds and runs the production build locally.
-- **`pnpm test`**: Runs the test suite using Vitest.
-- **`pnpm run typecheck`**: Runs TypeScript type checking.
-- **`pnpm run typegen`**: Generates TypeScript types using Wrangler.
-- **`pnpm run deploy`**: Deploys the project to Cloudflare Pages.
-- **`pnpm run lint:fix`**: Automatically fixes linting issues.
-
----
-
-## Contributing
-
-We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
-
----
-
-## Roadmap
-
-Explore upcoming features and priorities on our [Roadmap](https://roadmap.sh/r/ottodev-roadmap-2ovzo).
-
----
-
-## FAQ
-
-For answers to common questions, issues, and to see a list of recommended models, visit our [FAQ Page](FAQ.md).
-
-
-# Licensing
-**Who needs a commercial WebContainer API license?**
-
-bolt.diy source code is distributed as MIT, but it uses WebContainers API that [requires licensing](https://webcontainers.io/enterprise) for production usage in a commercial, for-profit setting. (Prototypes or POCs do not require a commercial license.) If you're using the API to meet the needs of your customers, prospective customers, and/or employees, you need a license to ensure compliance with our Terms of Service. Usage of the API in violation of these terms may result in your access being revoked.
+**Note**: This tool validates cookie format and basic properties but cannot guarantee that valid cookies will work with Hotstar services, as that depends on various factors including account status, subscription validity, and Hotstar's current authentication requirements.
