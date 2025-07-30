@@ -1,0 +1,19 @@
+# Hotstar Cookie Validator - Requirements
+# Python built-in modules used (no external dependencies required):
+# - tkinter (GUI framework - comes with Python)
+# - pathlib (file system operations)
+# - datetime (date/time handling)
+# - json (JSON operations)
+# - re (regex operations)
+# - time (time operations)
+# - os (operating system interface)
+
+# This application uses only Python standard library modules
+# No additional pip installations required
+
+# Python version requirement:
+# Python >= 3.6 (for pathlib and f-string support)
+
+# Optional dependencies for enhanced functionality:
+# pyperclip>=1.8.2  # For clipboard operations (future enhancement)
+# pillow>=8.0.0     # For icons and images (future enhancement)
